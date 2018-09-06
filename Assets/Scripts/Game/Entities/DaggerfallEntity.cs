@@ -37,6 +37,8 @@ namespace DaggerfallWorkshop.Game.Entity
         public const int NumberBodyParts = 7;
         public const int FatigueMultiplier = 64;
 
+        protected DaggerfallEntityBehaviour entityBehaviour;
+
         protected Genders gender;
         protected DFCareer career = new DFCareer();
         protected string name;
@@ -45,7 +47,7 @@ namespace DaggerfallWorkshop.Game.Entity
         protected DaggerfallSkills skills = new DaggerfallSkills();
         protected DaggerfallResistances resistances = new DaggerfallResistances();
         protected ItemCollection items = new ItemCollection();
-        protected ItemEquipTable equipTable = new ItemEquipTable();
+        protected ItemEquipTable equipTable;
         protected WorldContext worldContext = WorldContext.Nothing;
         protected int maxHealth;
         protected int currentHealth;
@@ -59,6 +61,8 @@ namespace DaggerfallWorkshop.Game.Entity
         protected bool isWaterWalking;
         protected bool isWaterBreathing;
         protected MagicalConcealmentFlags magicalConcealmentFlags;
+        protected bool isEnhancedClimbing;
+        protected bool isEnhancedJumping;
 
         bool quiesce = false;
 
@@ -68,6 +72,14 @@ namespace DaggerfallWorkshop.Game.Entity
         #endregion
 
         #region Class Properties
+
+        /// <summary>
+        /// Gets the DaggerfallEntityBehaviour related to this DaggerfallEntity.
+        /// </summary>
+        public DaggerfallEntityBehaviour EntityBehaviour
+        {
+            get { return entityBehaviour; }
+        }
 
         /// <summary>
         /// Set true to suppress events during state restore.
@@ -188,6 +200,22 @@ namespace DaggerfallWorkshop.Game.Entity
             }
         }
 
+        /// Gets or sets enhanced climbing flag.
+        /// Note: This value is intentionally not serialized. It should only be set by live effects.
+        public bool IsEnhancedClimbing
+        {
+            get { return isEnhancedClimbing; }
+            set { isEnhancedClimbing = value; }
+        }
+
+        /// Gets or sets enhanced jumping flag.
+        /// Note: This value is intentionally not serialized. It should only be set by live effects.
+        public bool IsEnhancedJumping
+        {
+            get { return isEnhancedJumping; }
+            set { isEnhancedJumping = value; }
+        }
+
         /// Gets or sets world context of this entity for floating origin support.
         /// Not required by all systems but this is a nice central place for mobiles.
         /// </summary>
@@ -232,8 +260,11 @@ namespace DaggerfallWorkshop.Game.Entity
 
         #region Constructors
 
-        public DaggerfallEntity()
+        public DaggerfallEntity(DaggerfallEntityBehaviour entityBehaviour)
         {
+            this.entityBehaviour = entityBehaviour;
+            equipTable = new ItemEquipTable(this);
+
             // Allow for resetting specific player state on new game or when game starts loading
             SaveLoadManager.OnStartLoad += SaveLoadManager_OnStartLoad;
             StartGameBehaviour.OnNewGame += StartGameBehaviour_OnNewGame;
@@ -584,6 +615,8 @@ namespace DaggerfallWorkshop.Game.Entity
             isWaterWalking = false;
             isWaterBreathing = false;
             magicalConcealmentFlags = MagicalConcealmentFlags.None;
+            isEnhancedClimbing = false;
+            isEnhancedJumping = false;
             SetEntityDefaults();
         }
 

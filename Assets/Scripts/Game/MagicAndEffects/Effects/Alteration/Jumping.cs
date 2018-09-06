@@ -9,61 +9,59 @@
 // Notes:
 //
 
-using System;
-using UnityEngine;
 using DaggerfallConnect;
 using DaggerfallWorkshop.Game.Entity;
 
 namespace DaggerfallWorkshop.Game.MagicAndEffects.MagicEffects
 {
     /// <summary>
-    /// Levitate.
+    /// Jumping
     /// </summary>
-    public class Levitate : IncumbentEffect
+    public class Jumping : IncumbentEffect
     {
         public override void SetProperties()
         {
-            properties.Key = "Levitate";
-            properties.ClassicKey = MakeClassicKey(14, 255);
-            properties.GroupName = TextManager.Instance.GetText("ClassicEffects", "levitate");
+            properties.Key = "Jumping";
+            properties.ClassicKey = MakeClassicKey(27, 255);
+            properties.GroupName = TextManager.Instance.GetText("ClassicEffects", "jumping");
             properties.SubGroupName = string.Empty;
-            properties.SpellMakerDescription = DaggerfallUnity.Instance.TextProvider.GetRSCTokens(1562);
-            properties.SpellBookDescription = DaggerfallUnity.Instance.TextProvider.GetRSCTokens(1262);
+            properties.SpellMakerDescription = DaggerfallUnity.Instance.TextProvider.GetRSCTokens(1577);
+            properties.SpellBookDescription = DaggerfallUnity.Instance.TextProvider.GetRSCTokens(1277);
             properties.SupportDuration = true;
-            properties.AllowedTargets = TargetTypes.CasterOnly;
+            properties.AllowedTargets = EntityEffectBroker.TargetFlags_All;
             properties.AllowedElements = ElementTypes.Magic;
             properties.AllowedCraftingStations = MagicCraftingStations.SpellMaker;
-            properties.MagicSkill = DFCareer.MagicSkills.Thaumaturgy;
-            properties.DurationCosts = MakeEffectCosts(60, 100);
+            properties.MagicSkill = DFCareer.MagicSkills.Alteration;
+            properties.DurationCosts = MakeEffectCosts(20, 8);
         }
 
         public override void ConstantEffect()
         {
             base.ConstantEffect();
-            StartLevitating();
+            StartJumping();
         }
 
         public override void Start(EntityEffectManager manager, DaggerfallEntityBehaviour caster = null)
         {
             base.Start(manager, caster);
-            StartLevitating();
+            StartJumping();
         }
 
         public override void Resume(EntityEffectManager.EffectSaveData_v1 effectData, EntityEffectManager manager, DaggerfallEntityBehaviour caster = null)
         {
             base.Resume(effectData, manager, caster);
-            StartLevitating();
+            StartJumping();
         }
 
         public override void End()
         {
             base.End();
-            StopLevitating();
+            StopJumping();
         }
 
         protected override bool IsLikeKind(IncumbentEffect other)
         {
-            return (other is Levitate);
+            return (other is Jumping);
         }
 
         protected override void AddState(IncumbentEffect incumbent)
@@ -72,44 +70,24 @@ namespace DaggerfallWorkshop.Game.MagicAndEffects.MagicEffects
             incumbent.RoundsRemaining += RoundsRemaining;
         }
 
-        void StartLevitating()
+        void StartJumping()
         {
             // Get peered entity gameobject
             DaggerfallEntityBehaviour entityBehaviour = GetPeeredEntityBehaviour(manager);
             if (!entityBehaviour)
                 return;
 
-            // Enable levitation for player or enemies
-            if (entityBehaviour.EntityType == EntityTypes.Player)
-            {
-                GameManager.Instance.PlayerMotor.GetComponent<LevitateMotor>().IsLevitating = true;
-            }
-            else if (entityBehaviour.EntityType == EntityTypes.EnemyMonster || entityBehaviour.EntityType == EntityTypes.EnemyClass)
-            {
-                EnemyMotor enemyMotor = entityBehaviour.GetComponent<EnemyMotor>();
-                if (enemyMotor)
-                    enemyMotor.IsLevitating = true;
-            }
+            entityBehaviour.Entity.IsEnhancedJumping = true;
         }
 
-        void StopLevitating()
+        void StopJumping()
         {
             // Get peered entity gameobject
             DaggerfallEntityBehaviour entityBehaviour = GetPeeredEntityBehaviour(manager);
             if (!entityBehaviour)
                 return;
 
-            // Disable levitation for player or enemies
-            if (entityBehaviour.EntityType == EntityTypes.Player)
-            {
-                GameManager.Instance.PlayerMotor.GetComponent<LevitateMotor>().IsLevitating = false;
-            }
-            else if (entityBehaviour.EntityType == EntityTypes.EnemyMonster || entityBehaviour.EntityType == EntityTypes.EnemyClass)
-            {
-                EnemyMotor enemyMotor = entityBehaviour.GetComponent<EnemyMotor>();
-                if (enemyMotor)
-                    enemyMotor.IsLevitating = false;
-            }
+            entityBehaviour.Entity.IsEnhancedJumping = false;
         }
     }
 }
