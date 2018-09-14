@@ -132,6 +132,11 @@ namespace DaggerfallWorkshop.Game
             get { return (levitateMotor) ? levitateMotor.IsSwimming : false; }
         }
 
+        public bool IsLevitating
+        {
+            get { return (levitateMotor) ? levitateMotor.IsLevitating : false; }
+        }
+
         public CollisionFlags CollisionFlags
         {
             get { return collisionFlags; }
@@ -239,12 +244,7 @@ namespace DaggerfallWorkshop.Game
             }
 
             // Handle climbing
-            climbingMotor.ClimbingCheck(ref collisionFlags);
-
-            if (climbingMotor.IsClimbing)
-            {
-                acrobatMotor.Falling = false;
-            }
+            climbingMotor.ClimbingCheck();
 
             // Do nothing if player levitating/swimming or climbing - replacement motor will take over movement for levitating/swimming
             if (levitateMotor && (levitateMotor.IsLevitating || levitateMotor.IsSwimming) || climbingMotor.IsClimbing)
@@ -252,6 +252,12 @@ namespace DaggerfallWorkshop.Game
 
             // Player assumed to be in movement for now
             standingStill = false;
+
+
+            if (climbingMotor.WallEject)
+            {   // True in terms of the player having their feet on solid surface.
+                grounded = true;
+            }
 
             if (grounded)
             {

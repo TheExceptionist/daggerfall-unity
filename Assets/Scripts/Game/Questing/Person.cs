@@ -347,9 +347,10 @@ namespace DaggerfallWorkshop.Game.Questing
         /// </summary>
         public bool PlaceAtHome()
         {
-            // Does not attempt to place a questor as they should be statically place or moved manually
+            // Does not attempt to place a questor as they should be statically placed or moved manually
+            // Individual NPCs are also excluded as they are either automatically at home or moved elsewhere by quest
             Place homePlace = ParentQuest.GetPlace(homePlaceSymbol);
-            if (homePlace == null || isQuestor)
+            if (homePlace == null || isQuestor || isIndividualNPC)
                 return false;
 
             // Create SiteLink if not already present
@@ -1107,7 +1108,7 @@ namespace DaggerfallWorkshop.Game.Questing
 
         int GetCurrentRegionFaction()
         {
-            int oneBasedPlayerRegion = GameManager.Instance.PlayerGPS.CurrentOneBasedRegionIndex;
+            int oneBasedPlayerRegion = GameManager.Instance.PlayerGPS.CurrentRegionIndex;
             FactionFile.FactionData[] factions = GameManager.Instance.PlayerEntity.FactionData.FindFactions(
                 (int)FactionFile.FactionTypes.Province, -1, -1, oneBasedPlayerRegion);
 
@@ -1122,7 +1123,7 @@ namespace DaggerfallWorkshop.Game.Questing
         int GetCourtOfCurrentRegion()
         {
             // Find court in current region
-            int oneBasedPlayerRegion = GameManager.Instance.PlayerGPS.CurrentOneBasedRegionIndex;
+            int oneBasedPlayerRegion = GameManager.Instance.PlayerGPS.CurrentRegionIndex;
             FactionFile.FactionData[] factions = GameManager.Instance.PlayerEntity.FactionData.FindFactions(
                 (int)FactionFile.FactionTypes.Courts,
                 (int)FactionFile.SocialGroups.Nobility,
